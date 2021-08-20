@@ -47,12 +47,14 @@ class ChatRoom extends StatelessWidget {
               return Container(
                 child: Column(
                   children: [
+
                     Text(userMap['name']),
+
                   ],
                 ),
               );
             } else {
-              return Container();
+              return Scaffold();
             }
           },
         ),
