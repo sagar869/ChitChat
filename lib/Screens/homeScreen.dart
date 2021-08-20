@@ -1,9 +1,8 @@
-
 import 'package:chitchat/Screens/ChatRoom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
@@ -13,23 +12,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  Map<String, dynamic> userMap;
+  Map<String, dynamic>? userMap;
   bool isLoading = false;
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  FacebookLogin facebookLogin = FacebookLogin();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     setStatus("Online");
   }
 
   void setStatus(String status) async {
-    await _firestore.collection('users').doc(_auth.currentUser.uid).update({
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
       "status": status,
     });
   }
@@ -56,8 +54,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   logout() async{
     await googleSignIn.signOut();
-    facebookLogin.logOut();
+    //facebookLogin.logOut();
     _auth.signOut();
+    await FacebookAuth.instance.logOut();
     Navigator.pop(context);
   }
 
@@ -140,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ? ListTile(
             onTap: () {
               String roomId = chatRoomId(
-                  _auth.currentUser.displayName, userMap['name']);
+                  _auth.currentUser!.displayName!, userMap!['name']);
 
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -151,16 +150,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
               );
             },
-            leading: CircleAvatar(backgroundImage: NetworkImage(_auth.currentUser.photoURL),),
+            leading: CircleAvatar(backgroundImage: NetworkImage(_auth.currentUser!.photoURL!),),
             title: Text(
-              userMap['name'],
+              userMap!['name'],
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 17,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            subtitle: Text(userMap['email']),
+            subtitle: Text(userMap!['email']),
             trailing: Icon(Icons.chat, color: Colors.black),
           )
               : Container(),

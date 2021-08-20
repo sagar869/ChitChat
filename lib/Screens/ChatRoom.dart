@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 
 class ChatRoom extends StatelessWidget {
-  final Map<String, dynamic> userMap;
-  final String chatRoomId;
+  final Map<String, dynamic>? userMap;
+  final String? chatRoomId;
   ChatRoom({this.chatRoomId,this.userMap});
 
   final TextEditingController _message = TextEditingController();
@@ -16,7 +16,7 @@ class ChatRoom extends StatelessWidget {
   void onSendMessage()async{
     if(_message.text.isNotEmpty){
       Map<String,dynamic>message ={
-        "sendby": _auth.currentUser.displayName,
+        "sendby": _auth.currentUser!.displayName,
         "message":_message.text,
         "time":FieldValue.serverTimestamp(),
       };
@@ -41,14 +41,14 @@ class ChatRoom extends StatelessWidget {
       appBar: AppBar(
         title: StreamBuilder<DocumentSnapshot>(
           stream:
-          _firestore.collection('users').doc(userMap['id']).snapshots(),
+          _firestore.collection('users').doc(userMap!['uid']).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.data != null) {
               return Container(
                 child: Column(
                   children: [
 
-                    Text(userMap['name']),
+                    Text(userMap!['name']),
 
                   ],
                 ),
@@ -60,7 +60,7 @@ class ChatRoom extends StatelessWidget {
         ),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(backgroundImage: NetworkImage(_auth.currentUser.photoURL),),
+          child: CircleAvatar(backgroundImage: NetworkImage(_auth.currentUser!.photoURL!),),
         ),
       ),
       body: SingleChildScrollView(
@@ -80,10 +80,10 @@ class ChatRoom extends StatelessWidget {
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.data != null) {
                     return ListView.builder(
-                      itemCount: snapshot.data.docs.length,
+                      itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         Map<String, dynamic> map =
-                        snapshot.data.docs[index].data();
+                        snapshot.data!.docs[index].data() as Map<String, dynamic>;
                         return messages(size, map);
                       },
                     );
@@ -130,7 +130,7 @@ class ChatRoom extends StatelessWidget {
   Widget messages(Size size, Map<String, dynamic> map) {
     return Container(
       width: size.width,
-      alignment: map['sendby'] == _auth.currentUser.displayName
+      alignment: map['sendby'] == _auth.currentUser!.displayName
           ? Alignment.centerRight
           : Alignment.centerLeft,
       child: Container(
